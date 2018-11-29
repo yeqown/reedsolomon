@@ -216,6 +216,15 @@ func (b *Binary) Len() int {
 	return b.lenBits
 }
 
+// Bytes ...
+func (b *Binary) Bytes() []byte {
+	numBytes := b.lenBits / 8
+	if b.lenBits%8 != 0 {
+		numBytes++
+	}
+	return b.bits[:numBytes]
+}
+
 // EqualTo ...
 func (b *Binary) EqualTo(other *Binary) bool {
 	if b.lenBits != other.lenBits {
@@ -234,4 +243,12 @@ func (b *Binary) EqualTo(other *Binary) bool {
 	}
 
 	return true
+}
+
+// Copy ...
+func (b *Binary) Copy() *Binary {
+	return &Binary{
+		bits:    b.bits,
+		lenBits: b.lenBits,
+	}
 }

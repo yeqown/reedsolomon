@@ -574,3 +574,45 @@ func TestBinary_EqualTo(t *testing.T) {
 		})
 	}
 }
+
+func TestBinary_Copy(t *testing.T) {
+	type fields struct {
+		bits    []byte
+		lenBits int
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *Binary
+	}{
+		{
+			name: "case 0",
+			fields: fields{
+				bits:    []byte{0x12, 0x34},
+				lenBits: 16,
+			},
+			want: &Binary{
+				bits:    []byte{0x12, 0x34},
+				lenBits: 16,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &Binary{
+				bits:    tt.fields.bits,
+				lenBits: tt.fields.lenBits,
+			}
+			got := b.Copy()
+			b.AppendByte(0x33, 8)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Binary.Copy() = %v, want %v", got, tt.want)
+			}
+
+			if b.EqualTo(got) {
+				t.Errorf("Binary.Copy() changed b: %v, but copy %v changed too", b, got)
+			}
+		})
+	}
+}
