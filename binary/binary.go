@@ -6,6 +6,7 @@ package binary
 import (
 	"bytes"
 	"fmt"
+	"log"
 )
 
 const (
@@ -129,6 +130,23 @@ func (b *Binary) Append(other *Binary) {
 		if other.At(i) {
 			b.bits[b.lenBits/8] |= 0x80 >> uint(b.lenBits%8)
 		}
+		b.lenBits++
+	}
+}
+
+// AppendUint32 other bitset link another Bitset to after the b
+func (b *Binary) AppendUint32(value uint32, numBits int) {
+	b.ensureCapacity(numBits)
+
+	if numBits > 32 {
+		log.Panicf("numBits %d out of range 0-32", numBits)
+	}
+
+	for i := numBits - 1; i >= 0; i-- {
+		if value&(1<<uint(i)) != 0 {
+			b.bits[b.lenBits/8] |= 0x80 >> uint(b.lenBits%8)
+		}
+
 		b.lenBits++
 	}
 }

@@ -616,3 +616,64 @@ func TestBinary_Copy(t *testing.T) {
 		})
 	}
 }
+
+func TestBinary_AppendUint32(t *testing.T) {
+	type fields struct {
+		bits    []byte
+		lenBits int
+	}
+	type args struct {
+		value   uint32
+		numBits int
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *Binary
+	}{
+		{
+			name: "case 0",
+			fields: fields{
+				bits:    []byte{0x22},
+				lenBits: 8,
+			},
+			args: args{
+				value:   0xf12f,
+				numBits: 9,
+			},
+			want: &Binary{
+				bits:    []byte{0x22, 0x97, 0x80},
+				lenBits: 17,
+			},
+		},
+		{
+			name: "case 2",
+			fields: fields{
+				bits:    []byte{0x22},
+				lenBits: 8,
+			},
+			args: args{
+				value:   0xf12f,
+				numBits: 13,
+			},
+			want: &Binary{
+				bits:    []byte{0x22, 0x89, 0x78},
+				lenBits: 21,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &Binary{
+				bits:    tt.fields.bits,
+				lenBits: tt.fields.lenBits,
+			}
+			t.Logf("origin binary: %v", b)
+			b.AppendUint32(tt.args.value, tt.args.numBits)
+			if !b.EqualTo(tt.want) {
+				t.Errorf("Binary.AppendUint32(): %v, want: %v", b, tt.want)
+			}
+		})
+	}
+}
